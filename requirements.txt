@@ -1,0 +1,5 @@
+aiogram==2.24
+aiosqlite==0.18.0
+apscheduler==3.10.0
+pyTelegramBotAPI==4.9.0
+requests==2.28.1
