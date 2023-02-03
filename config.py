@@ -1,4 +1,4 @@
-token_bot = "5819256207:AAGEgF83TzYErQHGFBmLwTsQd-bArvyutzA"
+token_bot = "5819256207:AAGEgF83TzYErQHGFBmLwTsQd-bArvyutzAdededaA"
 path_db = "bot.db"
 admin_id = "624886634"
 start_upd_hour = 6
