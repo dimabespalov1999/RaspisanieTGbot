@@ -1,17 +1,17 @@
 import aiosqlite
-import asyncio
+from config import path_db
 
 async def connectdb():
-    async with aiosqlite.connect("/home/bec/eclipse-workspace/Raspis_bot/bot.db") as cursor:
+    async with aiosqlite.connect(path_db) as cursor:
         return cursor
 async def cursorexecute(sql, params):
-    async with aiosqlite.connect("/home/bec/eclipse-workspace/Raspis_bot/bot.db") as cursor:
+    async with aiosqlite.connect(path_db) as cursor:
         await cursor.execute(sql, params)
         await cursor.commit()
         data = await cursor.execute_fetchall(sql)
         return data
 async def insertdata(sql):
-    async with aiosqlite.connect("/home/bec/eclipse-workspace/Raspis_bot/bot.db") as cursor:
+    async with aiosqlite.connect(path_db) as cursor:
         try:
             await cursor.execute(sql)
             await cursor.commit()
@@ -22,7 +22,7 @@ async def insertdata(sql):
 
 
 async def finduser(userid):
-    async with aiosqlite.connect("/home/bec/eclipse-workspace/Raspis_bot/bot.db") as cursor:
+    async with aiosqlite.connect(path_db) as cursor:
         data = await cursor.execute_fetchall(f"""SELECT id FROM User_tg WHERE user_id = '{userid}'""")
         await cursor.commit()
         if len(data) == 1:
@@ -31,13 +31,13 @@ async def finduser(userid):
             return False
 
 async def getusers():
-    async with aiosqlite.connect("/home/bec/eclipse-workspace/Raspis_bot/bot.db") as cursor:
+    async with aiosqlite.connect(path_db) as cursor:
         data = await cursor.execute_fetchall(f"""SELECT user_id FROM User_tg""")
         await cursor.commit()
         return data
 
 async def getgroupusr(userid):
-    async with aiosqlite.connect("/home/bec/eclipse-workspace/Raspis_bot/bot.db") as cursor:
+    async with aiosqlite.connect(path_db) as cursor:
         data = await cursor.execute_fetchall(f"""SELECT group_id FROM User_tg WHERE user_id = '{userid}'""")
         await cursor.commit()
         data = list(data[0])
@@ -46,7 +46,7 @@ async def getgroupusr(userid):
 
 async def getrasp(userid,first_day, last_day): #2023-01-24T00:00:00/2023-01-32T00:00:00
     group = await getgroupusr(userid)
-    async with aiosqlite.connect("/home/bec/eclipse-workspace/Raspis_bot/bot.db") as cursor:
+    async with aiosqlite.connect(path_db) as cursor:
         data = await cursor.execute_fetchall(f"""
         SELECT * FROM Raspis 
         WHERE 
