@@ -22,9 +22,10 @@ class Importdata:
     def add_all_raspis(self):
         k = 0
         for group in self.group:
-            k = k + 1
+
             response = requests.get(f"{self.url_raspis}{group['group_id']}").json()
             for i in response['data']['rasp']:
+                k = k + 1
                 rasp = {'start_time': i['начало'],
                         'start_date': i['датаНачала'],
                         'stop_time': i['конец'],
@@ -37,7 +38,8 @@ class Importdata:
                         'updateDay': response['data']['info']['dateUploadingRasp'],
                         'id': k}
                 self.rasp.append(rasp)
-                # print(rasp)
+        print(len(self.rasp))
+        print(self.rasp)
 
 
     @connectdb
@@ -66,35 +68,16 @@ class Importdata:
                 # print("записываю гуруппу")
 
     @connectdb
-    def raspupdate(self, cursor):
-        for i in self.rasp:
-            print('оьновление расписания')
-            cursor.execute("""SELECT discipline FROM Raspis WHERE update_day != ? AND id = ?""",(i['updateDay'], i['id']))
-
-            print(cursor.fetchall())
-            if len(cursor.fetchall()) > 0:
-            # if len(cursor.fetchall()) == 0:
-                print("обновляю")
-                cursor.execute("""UPDATE Raspis SET start_time = ?, start_date = ?, stop_time = ?, number_date = ?,
-                                                    day_week = ?, discipline = ?, prepod = ?, audit = ?, group_id = ?,
-                                                    update_day = ?
-                                  WHERE id = ?""",
-                               (i['start_time'], i['start_date'], i['stop_time'], i['number_date'], i['day_week'],
-                                i['discipline'], i['prepod'], i['audit'], i['group_id'], i['updateDay'], i['id']))
-            else:
-                print("обновление не требуеся")
-    @connectdb
     def insertrasp(self, cursor):
-        cursor.execute("""DELETE FROM Raspis """)
+        cursor.execute("""DELETE FROM Raspis""")
         for i in self.rasp:
-            # print('запись расписания')
-            cursor.execute("""INSERT INTO Raspis(start_time, start_date, stop_time, number_date,
-                                        day_week, discipline, prepod, audit, group_id,
-                                        update_day)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                            ON CONFLICT DO NOTHING""",
-                           (i['start_time'], i['start_date'], i['stop_time'], i['number_date'], i['day_week'],
+            cursor.execute("""INSERT INTO Raspis(id, start_time, start_date, stop_time, number_date,
+                                                                    day_week, discipline, prepod, audit, group_id,
+                                                                    update_day)
+                                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                           (i['id'], i['start_time'], i['start_date'], i['stop_time'], i['number_date'], i['day_week'],
                             i['discipline'], i['prepod'], i['audit'], i['group_id'], i['updateDay']))
+
 
 
 def updatedb():
@@ -136,6 +119,6 @@ def startupdate():
 #         except Exception as exc:
 #             print(exc)
 #             con = False
-#
+
 #
 # start()
