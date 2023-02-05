@@ -30,6 +30,6 @@ cursor.execute("""CREATE TABLE Raspis(
         audit TEXT,
         group_id INTEGER NOT NULL,
         update_day TEXT,
-        PRIMARY KEY ("id" AUTOINCREMENT),
+        PRIMARY KEY ("id"),
         FOREIGN KEY (group_id) REFERENCES Groups(group_id));""")
 conn.commit()
