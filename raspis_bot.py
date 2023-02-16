@@ -1,7 +1,7 @@
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from core.handlers.basic import get_start
+from core.handlers.basic import get_start, get_profile
 from core.handlers.orderingfackursgroup import cmd_reg
 from core.handlers import common, orderingfackursgroup, getrasp
 import asyncio
@@ -32,12 +32,13 @@ async def start():
     dp = Dispatcher(storage=MemoryStorage())
 
     scheduller = AsyncIOScheduler(timezone='Europe/Moscow')
-    scheduller.add_job(getrasp.raspnxtdy, trigger='cron', hour=config.send_rasp_hour, minute=10)
+    scheduller.add_job(getrasp.raspnxtdy, trigger='cron', hour=config.send_rasp_hour, minute=config.start_upd_min)
     scheduller.add_job(startupdate, trigger='cron', hour=config.start_upd_hour, minute=config.start_upd_min)
     scheduller.start()
-
+    #await getrasp.raspnxtdy()
     dp.message.register(get_start, Command(commands=['start']))
-    dp.message.register(cmd_reg, Command(commands=['reg']))
+    dp.message.register(cmd_reg, Command(commands=['Зрегистрировться']))
+    dp.message.register(get_profile, Command(commands=['profile']))
 
     dp.include_router(common.router)
     dp.include_router(orderingfackursgroup.router)
