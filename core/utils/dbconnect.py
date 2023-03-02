@@ -10,6 +10,7 @@ async def cursorexecute(sql, params):
         await cursor.commit()
         data = await cursor.execute_fetchall(sql)
         return data
+
 async def insertdata(sql):
     async with aiosqlite.connect(path_db) as cursor:
         try:
@@ -19,8 +20,6 @@ async def insertdata(sql):
         except Exception as e:
             print(e)
             return False
-
-
 
 async def finduser(userid):
     async with aiosqlite.connect(path_db) as cursor:
@@ -48,12 +47,14 @@ async def getgroupusr(userid):
         await cursor.commit()
         data = list(data[0])
         return data
+
 async def get_prof(userid):
     async with aiosqlite.connect(path_db) as cursor:
         data = await cursor.execute_fetchall(f"""SELECT * FROM User_tg WHERE user_id = '{userid}'""")
         await cursor.commit()
         # print(data)
         return data
+
 async def get_group_name(id:list[int]):
     async with aiosqlite.connect(path_db) as cursor:
         if len(id) == 4:
@@ -71,10 +72,18 @@ async def log_event(userid, username, name, event, msg, date):
         await cursor.execute(f"""INSERT INTO Logs(user_id, username, name, event, msg, date) VALUES(?, ?, ?, ?, ?, ?)""",
                              (userid, username, name, event, msg, date))
         await cursor.commit()
+
 async def upd_last(userid, date):
     async with aiosqlite.connect(path_db) as cursor:
         await cursor.execute(f"""UPDATE User_tg SET last_date = '{date}' WHERE user_id = '{userid}' """)
         await cursor.commit()
+
+async def getdate():
+    async with aiosqlite.connect(path_db) as cursor:
+        data = await cursor.execute_fetchall(f"""SELECT update_day FROM Raspis""")
+        await cursor.commit()
+        data = data[0][0]
+        return data
 
 
 async def getrasp(userid,first_day, last_day): #2023-01-24T00:00:00/2023-01-32T00:00:00

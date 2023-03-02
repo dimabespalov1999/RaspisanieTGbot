@@ -1,12 +1,17 @@
+import asyncio
 import datetime
 import logging
 import aiogram.exceptions
-from core.utils.messages import head_rasp_msg, date_rasp_msg, raspis_msg_students, raspis_msg_prepods, non_lessons
+import requests
+import config
+from add_update_db import startupdate
+from core.utils.messages import head_rasp_msg, date_rasp_msg, raspis_msg_students, raspis_msg_prepods, non_lessons, \
+    check_update_msg
 from raspis_bot import bot
 from aiogram import Router
 from aiogram.filters.command import Command
 from aiogram.types import Message, ReplyKeyboardRemove
-from core.utils.dbconnect import finduser, getrasp, getusers, log_event, upd_last
+from core.utils.dbconnect import finduser, getrasp, getusers, log_event, upd_last, getdate
 
 router = Router()
 
@@ -83,14 +88,34 @@ async def raspnxtdy():
             logging.basicConfig(level=logging.WARNING,
                                 format="%(asctime)s - [%(levelname)s] - %(name)s "
                                        "(%(filename)s).%(funcName)s(%(lineno)d) - %(message)s")
-
     print('отправил всем сообщение')
+
+async def checupdate():
+    update_day = await getdate()
+    url_raspis = config.url_raspis
+    response = requests.get(f"{url_raspis}").json()
+    rasp_up_date = response['data']['info']['dateUploadingRasp']
+    print(f"{rasp_up_date}     {update_day}")
+    if update_day == rasp_up_date:
+        print("Обновление не требуется")
+    else:
+        startupdate()
+        await asyncio.sleep(90)
+        data = await getusers()
+        for user in data:
+            try:
+                await bot.send_message(user[0], text=check_update_msg.format(rasp_up_date))
+
+            except aiogram.exceptions.TelegramBadRequest as e:
+                print(f"Отправка не возможна: {e}")
+            except aiogram.exceptions.TelegramForbiddenError as e:
+                print(f"Отправка не возможна: {e} на id: {user[0]}")
+        print("Рассылка оповещения об обновлении успешна")
 
 
 @router.message(Command(commands=['getrasp']))
 async def cmd_getrasp(message: Message):
     user = await finduser(message.from_user.id)
-
     if user is True:
         now = datetime.datetime.now().date()
         delta = now + datetime.timedelta(10)

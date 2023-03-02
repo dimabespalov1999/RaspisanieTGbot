@@ -1,14 +1,16 @@
 import datetime
 import requests
+
+import config
 from sqlitebdmanagement import connectdb
 from multiprocessing import Process
 
 
 class Importdata:
     def __init__(self):
-        self.url_groups = "http://80.76.178.21:8053/api/raspGrouplist?year=2022-2023"
-        self.url_raspis = "http://80.76.178.21:8053/api/Rasp?idgroup="
-        self.url_prepods = "http://80.76.178.21:8053/api/raspTeacherlist?year=2022-2023"
+        self.url_groups = config.url_groups
+        self.url_raspis = config.url_raspis
+        self.url_prepods = config.url_prepods
         self.group = []
         self.rasp = []
         self.prepods = []
@@ -20,6 +22,7 @@ class Importdata:
             k = k + 1
             group = {"name": i['name'], "group_id": i['id'], "kurs": i['kurs'], "facul": i['facul'], "id": k}
             self.group.append(group)
+
     def add_prepods(self):
         response = requests.get(self.url_prepods).json()
         k = 0

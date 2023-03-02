@@ -1,15 +1,16 @@
+from datetime import timedelta, datetime
+
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from core.handlers.basic import get_start, get_profile
-from core.handlers.orderingfackursgroup import cmd_reg
 from core.handlers import common, orderingfackursgroup, getrasp
 import asyncio
 import config
 import logging
 from core.utils.commands import set_commansd
 from aiogram.filters import Command
-from add_update_db import startupdate
+
 
 bot = Bot(token=config.token_bot, parse_mode='HTML')
 
@@ -26,18 +27,16 @@ async def stop_bot(bot: Bot):
 async def start():
     logging.basicConfig(level=logging.INFO,
                         format="%(asctime)s - [%(levelname)s] - %(name)s "
-                               "(%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
-                        )
+                               "(%(filename)s).%(funcName)s(%(lineno)d) - %(message)s")
 
     dp = Dispatcher(storage=MemoryStorage())
 
     scheduller = AsyncIOScheduler(timezone='Europe/Moscow')
     scheduller.add_job(getrasp.raspnxtdy, trigger='cron', hour=config.send_rasp_hour, minute=config.start_upd_min)
-    scheduller.add_job(startupdate, trigger='cron', hour=config.start_upd_hour, minute=config.start_upd_min)
+    scheduller.add_job(getrasp.checupdate, trigger='interval', hours=config.start_upd_hour, next_run_time = datetime.now() + timedelta(seconds = 10))
     scheduller.start()
-    #await getrasp.raspnxtdy()
+
     dp.message.register(get_start, Command(commands=['start']))
-    dp.message.register(cmd_reg, Command(commands=['Зрегистрировться']))
     dp.message.register(get_profile, Command(commands=['profile']))
 
     dp.include_router(common.router)
