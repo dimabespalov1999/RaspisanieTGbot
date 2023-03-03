@@ -5,12 +5,13 @@ import aiogram.exceptions
 import requests
 import config
 from add_update_db import startupdate
+from core.keyboards.meny import menu
 from core.utils.messages import head_rasp_msg, date_rasp_msg, raspis_msg_students, raspis_msg_prepods, non_lessons, \
     check_update_msg
 from raspis_bot import bot
 from aiogram import Router
 from aiogram.filters.command import Command
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message
 from core.utils.dbconnect import finduser, getrasp, getusers, log_event, upd_last, getdate
 
 router = Router()
@@ -55,13 +56,15 @@ async def sendraspmsg(user: str, first: str, last: str):
             txt = msg[i:i + 1]
             txt1 = ' '.join(txt)
             try:
-                await bot.send_message(user, text=txt1, reply_markup=ReplyKeyboardRemove)
+                await bot.send_message(user, text=txt1, reply_markup=await menu())
             except aiogram.exceptions.TelegramForbiddenError:
                 logging.basicConfig(level=logging.WARNING,
                                     format="%(asctime)s - [%(levelname)s] - %(name)s "
                                            "(%(filename)s).%(funcName)s(%(lineno)d) - %(message)s")
     else:
-        await bot.send_message(user, text=non_lessons, reply_markup=ReplyKeyboardRemove)
+        await bot.send_message(user, text=non_lessons, reply_markup=await menu())
+
+
 
 
 
@@ -79,7 +82,7 @@ async def raspnxtdy():
     for user in users:
         try:
             await bot.send_message(user, text=head_rasp_msg)
-            await sendraspmsg(user, first, last)
+            await sendraspmsg(user, first, last, )
         except aiogram.exceptions.TelegramBadRequest as e:
             logging.basicConfig(level=logging.WARNING,
                                 format="%(asctime)s - [%(levelname)s] - %(name)s "
@@ -121,7 +124,7 @@ async def cmd_getrasp(message: Message):
         delta = now + datetime.timedelta(10)
         first = str(now) + 'T00:00:00'
         last = str(delta) + 'T00:00:00'
-        await sendraspmsg(str(message.from_user.id), first, last)
+        await sendraspmsg(str(message.from_user.id), first, last, )
 
         user_id = message.from_user.id
         username = message.from_user.username
@@ -134,4 +137,4 @@ async def cmd_getrasp(message: Message):
 
     else:
         await message.answer(text="Твой аккаунт не найден, пройди регистрацию нажав комманду /reg",
-                             reply_markup=ReplyKeyboardRemove)
+                             reply_markup=await menu())

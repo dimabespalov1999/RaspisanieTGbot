@@ -10,6 +10,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove
 
+from core.keyboards.meny import menu
 from core.utils.dbconnect import cursorexecute, insertdata, finduser, log_event
 from core.keyboards.keyb_generator import make_keyb, makegroups
 from core.utils.messages import start_msg, reg_msg, help_msg, updated_msg, registered_msg, registered1_msg, \
@@ -45,7 +46,7 @@ async def cmd_reg(message: Message, state: FSMContext):
         await state.set_state(OrderGroup.choosing_role)
         await state.update_data(updating_prof=False)
     else:
-        await message.answer(text=f"{registered1_msg} {help_msg}", reply_markup=ReplyKeyboardRemove)
+        await message.answer(text=f"{registered1_msg} {help_msg}", reply_markup= await menu())
 
 
 @router.message(Command(commands=['updprof']))
@@ -65,7 +66,7 @@ async def cmd_updprof(message: Message, state: FSMContext):
         await log_event(user_id, username, name, event, mess, date)
     else:
         await message.answer(text=reg_msg.format(message.from_user.first_name),
-                             reply_markup=ReplyKeyboardRemove)
+                             reply_markup= make_keyb(['Зарегистрироваться']))
 
 
 @router.message(OrderGroup.choosing_role, F.text.in_(roles))
@@ -128,7 +129,7 @@ async def answer_choosing(message: Message, state: FSMContext):
             await state.set_state(OrderGroup.choosing_prepods)
     else:
         await message.answer(text=f"{sps_reg.format(message.from_user.first_name)}{help_msg}",
-                             reply_markup=ReplyKeyboardRemove)
+                             reply_markup=await menu())
     event = 'Регистрация или обновление'
     user_id = message.from_user.id
     username = message.from_user.username
@@ -160,7 +161,7 @@ async def prepods_chosing(message: Message, state: FSMContext):
 
     if data['updating_prof'] is True:
         await insertdata(sql)
-        await message.answer(text=f"""<b>Аккаунт обновлен!</b>""", reply_markup=ReplyKeyboardRemove)
+        await message.answer(text=f"""<b>Аккаунт обновлен!</b>""", reply_markup=await menu())
         event = 'Обновление аккаунта'
         user_id = message.from_user.id
         username = message.from_user.username
@@ -172,10 +173,10 @@ async def prepods_chosing(message: Message, state: FSMContext):
         sig = await insertdata(sql)
         if sig is True:
             await message.answer(text=f"""<b>Cпасибо за регистрацию {message.from_user.first_name}!{help_msg}</b>""",
-                                 reply_markup=ReplyKeyboardRemove)
+                                 reply_markup=await menu())
         else:
             await message.answer(text=f"{registered1_msg} {help_msg}",
-                                 reply_markup=ReplyKeyboardRemove)
+                                 reply_markup=await menu())
     await state.set_state(OrderGroup.comp_state)
 @router.message(OrderGroup.comp_state, Groups(groupslist))
 async def fac_choosing(message: Message):
@@ -224,7 +225,7 @@ async def group_choosing(message: Message, state: FSMContext):
         WHERE user_id = '{message.from_user.id}' """
         await insertdata(sql)
         await message.answer(text=updated_msg.format(data['choosen_fac'], kurs, message.text),
-                             reply_markup=ReplyKeyboardRemove)
+                             reply_markup=await menu())
         user_id = message.from_user.id
         username = message.from_user.username
         name = f"{message.from_user.first_name} {message.from_user.last_name}"
@@ -239,7 +240,7 @@ async def group_choosing(message: Message, state: FSMContext):
         sig = await insertdata(sql)
         if sig is True:
             await message.answer(text=registered_msg.format(message.from_user.first_name, data['choosen_fac'],
-                                                            kurs, message.text ), reply_markup=ReplyKeyboardRemove)
+                                                            kurs, message.text ), reply_markup=await menu())
             user_id = message.from_user.id
             username = message.from_user.username
             name = f"{message.from_user.first_name} {message.from_user.last_name}"
@@ -248,4 +249,4 @@ async def group_choosing(message: Message, state: FSMContext):
             date = datetime.now()
             await log_event(user_id, username, name, event, mess, date)
         else:
-            await message.answer(text=f"{registered1_msg} {help_msg}", reply_markup=ReplyKeyboardRemove)
+            await message.answer(text=f"{registered1_msg} {help_msg}", reply_markup=await menu())

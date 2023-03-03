@@ -1,20 +1,18 @@
 from datetime import datetime
-
 from aiogram import Bot
-from aiogram.types import Message, ReplyKeyboardRemove
-
 from core.keyboards.keyb_generator import make_keyb
+from core.keyboards.meny import menu
 from core.utils.dbconnect import finduser, get_prof, log_event, upd_last, get_group_name
 from core.utils.messages import profile_stud_msg, profile_prepod_msg, reg_msg, start_msg
-
+from aiogram.types import Message
 
 async def get_start(message: Message, bot: Bot):
     userid = message.from_user.id
     user = await finduser(userid)
     if user is True:
-        await bot.send_message(message.from_user.id, start_msg, reply_markup=ReplyKeyboardRemove)
+        await bot.send_message(message.from_user.id, start_msg, reply_markup= await menu())
     else:
-        await bot.send_message(message.from_user.id, reg_msg.format(message.from_user.first_name), reply_markup= make_keyb(["/reg"]))
+        await bot.send_message(message.from_user.id, reg_msg.format(message.from_user.first_name), reply_markup= make_keyb(['Зарегистрироваться']))
 async def get_profile(message: Message, bot: Bot):
     user_id = message.from_user.id
     user = await finduser(user_id)
@@ -37,7 +35,7 @@ async def get_profile(message: Message, bot: Bot):
             facul = groupdata[0][2]
             group = groupdata[0][0]
             msg = profile_stud_msg.format(message.from_user.first_name, status, kurs, facul, group, last_date, reg_date)
-            await bot.send_message(message.from_user.id, msg)
+            await bot.send_message(message.from_user.id, msg, reply_markup=await menu())
         else:
             status = 'Преподаватель'
             last_date = userdata[0][8]
@@ -50,9 +48,9 @@ async def get_profile(message: Message, bot: Bot):
 
                 k=k+1
                 msg.append(f"\n<b>Преодаватель</b> {k} - {i[0]}")
-            await bot.send_message(message.from_user.id, ' '.join(msg))
+            await bot.send_message(message.from_user.id, ' '.join(msg), reply_markup=await menu())
     else:
-        await bot.send_message(message.from_user.id, reg_msg.format(message.from_user.first_name),reply_markup= make_keyb(["/reg"]))
+        await bot.send_message(message.from_user.id, reg_msg.format(message.from_user.first_name),reply_markup= make_keyb(['Зарегистрироваться']))
 
 
 

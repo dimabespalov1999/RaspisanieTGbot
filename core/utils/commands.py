@@ -22,6 +22,10 @@ async def set_commansd(bot: Bot):
         BotCommand(
             command='getrasp',
             description='Просмотреть расписание'
+        ),
+        BotCommand(
+            command='chooseday',
+            description='Просмотреть расписание на выбранный день'
         )
     ]
 
