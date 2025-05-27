@@ -2,8 +2,8 @@ pipeline {
     agent any
     stages {
         stage('Zip files') {
-            steps {
-                zip zipFile: 'tgbot.zip', dir: '.', archive: true
+            script {
+                  zip zipFile: 'tgbot.zip', dir: '.', excludes: 'venv/**'
             }
         }
     }
