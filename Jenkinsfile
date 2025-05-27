@@ -11,13 +11,13 @@ pipeline {
             steps {
                 script {
                     // Создаем архив zip из содержимого репозитория
-                    sh 'zip -r output.zip .'
+                    sh 'zip -r tgbot.zip .'
                 }
             }
         }
         stage('Archive Artifact') {
             steps {
-                archiveArtifacts artifacts: 'output.zip', fingerprint: true
+                archiveArtifacts artifacts: 'tgbot.zip', fingerprint: true
             }
         }
     }
