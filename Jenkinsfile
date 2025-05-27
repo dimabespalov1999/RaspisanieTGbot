@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Zip files') {
             steps {
-                  zip zipFile: 'tgbot.zip', dir: '.', excludes: 'venv/**'
+                  zip zipFile: 'tgbot.zip', dir: '.', exclude: 'venv/**'
             }
         }
     }
