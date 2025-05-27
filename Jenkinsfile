@@ -1,23 +1,9 @@
 pipeline {
     agent any
-
     stages {
-        stage('Checkout') {
+        stage('Zip files') {
             steps {
-                checkout scm
-            }
-        }
-        stage('Build ZIP') {
-            steps {
-                script {
-                    // Создаем архив zip из содержимого репозитория
-                    sh 'tar -czvf tgbot.tar.gz .'  // Создает сжатый gzip архив из текущей директории
-                }
-            }
-        }
-        stage('Archive Artifact') {
-            steps {
-                archiveArtifacts artifacts: 'tgbot.tar.gz', fingerprint: true
+                zip zipFile: 'tgbot.zip', dir: '.', archive: true
             }
         }
     }
